@@ -13,12 +13,15 @@ public class AST {
 	public AST() {
 		root = new Stylesheet();
 	}
+
 	public AST(Stylesheet stylesheet) {
 		root = stylesheet;
 	}
+
 	public void setRoot(Stylesheet stylesheet) {
 		root = stylesheet;
 	}
+
     public ArrayList<SemanticError> getErrors() {
 	    ArrayList<SemanticError> errors = new ArrayList<>();
         collectErrors(errors,root);

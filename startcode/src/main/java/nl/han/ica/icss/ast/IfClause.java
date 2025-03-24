@@ -5,7 +5,6 @@ import java.util.Objects;
 
 public class IfClause extends ASTNode {
 
-
     public Expression conditionalExpression;
     public ArrayList<ASTNode> body = new ArrayList<>();
     public ElseClause elseClause;

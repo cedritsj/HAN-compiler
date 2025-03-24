@@ -41,9 +41,10 @@ MIN: '-';
 MUL: '*';
 ASSIGNMENT_OPERATOR: ':=';
 
-
-
-
 //--- PARSER: ---
-stylesheet: EOF;
+selector: ID_IDENT | CLASS_IDENT | LOWER_IDENT;
+expression: variable_declaration | LOWER_IDENT COLON (PIXELSIZE | PERCENTAGE | COLOR) SEMICOLON;
+variable_declaration: (CAPITAL_IDENT | LOWER_IDENT) ASSIGNMENT_OPERATOR (COLOR | PIXELSIZE | PERCENTAGE | TRUE | FALSE) SEMICOLON;
+style_rule: selector OPEN_BRACE expression+ CLOSE_BRACE;
 
+stylesheet: style_rule+;

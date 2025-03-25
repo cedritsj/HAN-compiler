@@ -43,7 +43,7 @@ ASSIGNMENT_OPERATOR: ':=';
 //--- PARSER: ---
 id_selector         : ID_IDENT;
 class_selector      : CLASS_IDENT;
-tag_selector        : LOWER_IDENT;
+property_name       : LOWER_IDENT;
 
 add_operator        : PLUS;
 sub_operator        : MIN;
@@ -53,35 +53,37 @@ color_literal       : COLOR;
 percentage_literal  : PERCENTAGE;
 pixel_literal       : PIXELSIZE;
 scalar_literal      : SCALAR;
-capital_literal     : CAPITAL_IDENT;
 lower_literal       : LOWER_IDENT;
 boolean_literal     : TRUE | FALSE;
 
-literal             : capital_literal | lower_literal | pixel_literal | percentage_literal | scalar_literal;
+literal             : lower_literal | pixel_literal | percentage_literal | scalar_literal;
 
 arithmetic_expression : literal (( add_operator | sub_operator | mul_operator ) literal)+;
 
-property_value      : pixel_literal
+property_value      : (variable_identifier
+                    | pixel_literal
                     | percentage_literal
                     | color_literal
-                    | capital_literal
                     | lower_literal
-                    | arithmetic_expression;
+                    | arithmetic_expression
+                    | boolean_literal);
 
-declaration         : tag_selector COLON property_value SEMICOLON;
+declaration         : property_name COLON property_value SEMICOLON;
 
-variable_value      : color_literal
+variable_value      : variable_identifier
+                    | color_literal
                     | pixel_literal
                     | percentage_literal
                     | boolean_literal;
 
 rulebody            : (declaration|if_statement|variable_declaration)*;
-if_statement        : IF BOX_BRACKET_OPEN (id_selector | LOWER_IDENT | CLASS_IDENT | CAPITAL_IDENT)  BOX_BRACKET_CLOSE OPEN_BRACE rulebody CLOSE_BRACE else_statement?;
+if_statement        : IF BOX_BRACKET_OPEN (variable_identifier | boolean_literal)  BOX_BRACKET_CLOSE OPEN_BRACE rulebody CLOSE_BRACE else_statement?;
 else_statement      : ELSE OPEN_BRACE rulebody CLOSE_BRACE;
 
-variable_declaration : (capital_literal | lower_literal) ASSIGNMENT_OPERATOR variable_value+ SEMICOLON;
+variable_identifier  :  CAPITAL_IDENT;
+variable_declaration :  variable_identifier ASSIGNMENT_OPERATOR variable_value+ SEMICOLON;
 
-selector            : id_selector | class_selector | tag_selector;
+selector            : id_selector #idSelector | class_selector #classSelector | property_name #tagSelector;
 style_rule          : selector OPEN_BRACE rulebody CLOSE_BRACE;
 
 stylesheet          : variable_declaration* style_rule*;

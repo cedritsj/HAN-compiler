@@ -116,40 +116,7 @@ public class ASTListener extends ICSSBaseListener {
 		currentContainer.peek().addChild(declaration);
 	}
 
-	@Override
-	public void enterAdd_operator(ICSSParser.Add_operatorContext ctx) {
-		AddOperation operator = new AddOperation();
-		currentContainer.push(operator);
-	}
 
-	@Override
-	public void exitAdd_operator(ICSSParser.Add_operatorContext ctx) {
-		AddOperation operator = (AddOperation) currentContainer.pop();
-		currentContainer.peek().addChild(operator);
-	}
-
-	@Override
-	public void enterSub_operator(ICSSParser.Sub_operatorContext ctx) {
-		SubtractOperation operator = new SubtractOperation();
-		currentContainer.push(operator);
-	}
-
-	@Override
-	public void exitSub_operator(ICSSParser.Sub_operatorContext ctx) {
-		SubtractOperation operator = (SubtractOperation) currentContainer.pop();
-		currentContainer.peek().addChild(operator);
-	}
-
-	public void enterMul_operator(ICSSParser.Mul_operatorContext ctx) {
-		MultiplyOperation operator = new MultiplyOperation();
-		currentContainer.push(operator);
-	}
-
-	@Override
-	public void exitMul_operator(ICSSParser.Mul_operatorContext ctx) {
-		MultiplyOperation operator = (MultiplyOperation) currentContainer.pop();
-		currentContainer.peek().addChild(operator);
-	}
 
 	@Override
 	public void enterVariable_declaration(ICSSParser.Variable_declarationContext ctx) {
@@ -175,29 +142,55 @@ public class ASTListener extends ICSSBaseListener {
 		currentContainer.peek().addChild(variableReference);
 	}
 
-//	@Override
-//	public void enterIf_statement(ICSSParser.If_statementContext ctx) {
-//		IfClause ifClause = new IfClause();
-//		currentContainer.push(ifClause);
-//	}
-//
-//	@Override
-//	public void exitIf_statement(ICSSParser.If_statementContext ctx) {
-//		IfClause ifClause = (IfClause) currentContainer.pop();
-//		currentContainer.peek().addChild(ifClause);
-//	}
-//
-//	@Override
-//	public void enterElse_statement(ICSSParser.Else_statementContext ctx) {
-//		ElseClause elseClause = new ElseClause();
-//		currentContainer.push(elseClause);
-//	}
-//
-//	@Override
-//	public void exitElse_statement(ICSSParser.Else_statementContext ctx) {
-//		ElseClause elseClause = (ElseClause) currentContainer.pop();
-//		currentContainer.peek().addChild(elseClause);
-//	}
+	@Override
+	public void enterExpression(ICSSParser.ExpressionContext ctx) {
+		if (ctx.getChildCount() == 3) {
+			Operation operation;
+			switch (ctx.getChild(1).getText()) {
+				case "*":
+					operation = new MultiplyOperation();
+					break;
+				case "+":
+					operation = new AddOperation();
+					break;
+				default:
+					operation = new SubtractOperation();
+			}
+			currentContainer.push(operation);
+		}
+	}
+
+	@Override
+	public void exitExpression(ICSSParser.ExpressionContext ctx) {
+		if (expressionHasTerminalNode(ctx)) {
+			ASTNode operation = currentContainer.pop();
+			currentContainer.peek().addChild(operation);
+		}
+	}
+
+	@Override
+	public void enterIf_statement(ICSSParser.If_statementContext ctx) {
+		IfClause ifClause = new IfClause();
+		currentContainer.push(ifClause);
+	}
+
+	@Override
+	public void exitIf_statement(ICSSParser.If_statementContext ctx) {
+		IfClause ifClause = (IfClause) currentContainer.pop();
+		currentContainer.peek().addChild(ifClause);
+	}
+
+	@Override
+	public void enterElse_statement(ICSSParser.Else_statementContext ctx) {
+		ElseClause elseClause = new ElseClause();
+		currentContainer.push(elseClause);
+	}
+
+	@Override
+	public void exitElse_statement(ICSSParser.Else_statementContext ctx) {
+		ElseClause elseClause = (ElseClause) currentContainer.pop();
+		currentContainer.peek().addChild(elseClause);
+	}
 
 	@Override
 	public void enterColor_literal(ICSSParser.Color_literalContext ctx) {
@@ -205,6 +198,7 @@ public class ASTListener extends ICSSBaseListener {
 		currentContainer.push(colorLiteral);
 	}
 
+	@Override
 	public void exitColor_literal(ICSSParser.Color_literalContext ctx) {
 		ColorLiteral colorLiteral = (ColorLiteral) currentContainer.pop();
 		currentContainer.peek().addChild(colorLiteral);
@@ -258,5 +252,7 @@ public class ASTListener extends ICSSBaseListener {
 		currentContainer.peek().addChild(scalarLiteral);
 	}
 
-
+	private boolean expressionHasTerminalNode(ICSSParser.ExpressionContext ctx) {
+		return ctx.PLUS() != null || ctx.MIN() != null || ctx.MUL() != null;
+	}
 }

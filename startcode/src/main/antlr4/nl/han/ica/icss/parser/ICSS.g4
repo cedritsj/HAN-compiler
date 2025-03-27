@@ -45,10 +45,6 @@ id_selector         : ID_IDENT;
 class_selector      : CLASS_IDENT;
 property_name       : LOWER_IDENT;
 
-add_operator        : PLUS;
-sub_operator        : MIN;
-mul_operator        : MUL;
-
 color_literal       : COLOR;
 percentage_literal  : PERCENTAGE;
 pixel_literal       : PIXELSIZE;
@@ -56,16 +52,16 @@ scalar_literal      : SCALAR;
 lower_literal       : LOWER_IDENT;
 boolean_literal     : TRUE | FALSE;
 
-literal             : lower_literal | pixel_literal | percentage_literal | scalar_literal;
+literal: boolean_literal | color_literal | percentage_literal | pixel_literal | scalar_literal | variable_identifier;
 
-arithmetic_expression : literal (( add_operator | sub_operator | mul_operator ) literal)+;
+expression: literal | expression (MUL) expression | expression (PLUS | MIN) expression;
 
 property_value      : (variable_identifier
+                    | expression
                     | pixel_literal
                     | percentage_literal
                     | color_literal
                     | lower_literal
-                    | arithmetic_expression
                     | boolean_literal);
 
 declaration         : property_name COLON property_value SEMICOLON;

@@ -1,8 +1,6 @@
 package nl.han.ica.datastructures;
 
-import nl.han.ica.datastructures.IHANStack;
 import nl.han.ica.icss.ast.ASTNode;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 

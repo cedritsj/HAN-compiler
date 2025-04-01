@@ -7,6 +7,7 @@ import nl.han.ica.icss.ast.operations.MultiplyOperation;
 import nl.han.ica.icss.ast.operations.SubtractOperation;
 import nl.han.ica.icss.ast.types.ExpressionType;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -69,9 +70,25 @@ public class Checker {
             return;
         }
 
+        checkConditionalBody(child.getChildren());
+
+        if (child.elseClause != null) {
+            checkElseClause(child.elseClause);
+        }
+
+        variableTypes.pop();
+    }
+
+    private void checkElseClause(ElseClause child) {
+        checkConditionalBody(child.getChildren());
+
+        variableTypes.pop();
+    }
+
+    private void checkConditionalBody(ArrayList<ASTNode> children) {
         variableTypes.addFirst(new HashMap<>());
 
-        for (ASTNode astNode : child.getChildren()) {
+        for (ASTNode astNode : children) {
             if (astNode instanceof Stylerule) {
                 checkStylerule(astNode);
             } else if (astNode instanceof IfClause) {
@@ -82,24 +99,6 @@ public class Checker {
                 checkDeclaration((Declaration) astNode);
             }
         }
-
-        if (child.elseClause != null) {
-            checkElseClause(child.elseClause);
-        }
-
-        variableTypes.pop();
-    }
-
-    private void checkElseClause(ElseClause child) {
-        variableTypes.addFirst(new HashMap<>());
-
-        for (ASTNode astNode : child.getChildren()) {
-            if (astNode instanceof Stylerule) {
-                checkStylerule(astNode);
-            }
-        }
-
-        variableTypes.pop();
     }
 
     private void checkDeclaration(Declaration child) {
@@ -183,8 +182,7 @@ public class Checker {
     private ExpressionType determineExpressionType(Expression expression) {
         if (expression instanceof VariableReference) {
             return checkVariableReference(expression);
-        } else
-        if (expression instanceof ColorLiteral) {
+        } else if (expression instanceof ColorLiteral) {
             return ExpressionType.COLOR;
         } else if (expression instanceof PixelLiteral) {
             return ExpressionType.PIXEL;

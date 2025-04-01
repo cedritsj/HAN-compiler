@@ -46,7 +46,9 @@ public class Checker {
                 continue;
             }
 
-            // IF clause
+            if (child instanceof IfClause) {
+                checkIfClause((IfClause) child);
+            }
 
             if (child instanceof VariableAssignment) {
                 checkVariableAssignment((VariableAssignment) child);
@@ -54,26 +56,70 @@ public class Checker {
         }
     }
 
+    private void checkIfClause(IfClause child) {
+        ExpressionType expressionType = checkExpression(child.conditionalExpression);
+
+        if (expressionType == ExpressionType.UNDEFINED || expressionType == null) {
+            child.setError("If clause condition has an undefined type");
+            return;
+        }
+
+        if (expressionType != ExpressionType.BOOL) {
+            child.setError("If clause condition must be a boolean literal");
+            return;
+        }
+
+        variableTypes.addFirst(new HashMap<>());
+
+        for (ASTNode astNode : child.getChildren()) {
+            if (astNode instanceof Stylerule) {
+                checkStylerule(astNode);
+            } else if (astNode instanceof IfClause) {
+                checkIfClause((IfClause) astNode);
+            } else if (astNode instanceof VariableReference) {
+                checkVariableReference(astNode);
+            } else if (astNode instanceof Declaration) {
+                checkDeclaration((Declaration) astNode);
+            }
+        }
+
+        if (child.elseClause != null) {
+            checkElseClause(child.elseClause);
+        }
+
+        variableTypes.pop();
+    }
+
+    private void checkElseClause(ElseClause child) {
+        variableTypes.addFirst(new HashMap<>());
+
+        for (ASTNode astNode : child.getChildren()) {
+            if (astNode instanceof Stylerule) {
+                checkStylerule(astNode);
+            }
+        }
+
+        variableTypes.pop();
+    }
+
     private void checkDeclaration(Declaration child) {
+        ExpressionType type = checkExpression(child.expression);
+
         switch (child.property.name) {
             case "width":
             case "height":
-                if (!(child.expression instanceof PixelLiteral || child.expression instanceof PercentageLiteral || child.expression instanceof VariableReference || child.expression instanceof Operation)) {
-                    child.setError(child.property.name + " must be a pixel or percentage literal OR a variable reference");
+                if (type != ExpressionType.PIXEL && type != ExpressionType.PERCENTAGE) {
+                    child.setError(child.property.name + " must be a pixel or percentage literal or a variable reference to a pixel or percentage");
                 } else if (child.expression instanceof VariableReference) {
                     checkVariableReference(child.expression);
+                } else if (child.expression instanceof Operation) {
+                    checkOperation((Operation) child.expression);
                 }
                 break;
             case "background-color":
-                if (!(child.expression instanceof ColorLiteral || child.expression instanceof VariableReference)) {
-                    child.setError("Background color must be a color literal");
-                } else if (child.expression instanceof VariableReference) {
-                    checkVariableReference(child.expression);
-                }
-                break;
             case "color":
-                if (!(child.expression instanceof ColorLiteral || child.expression instanceof VariableReference)) {
-                    child.setError("Color must be a color literal");
+                if (type != ExpressionType.COLOR) {
+                    child.setError(child.property.name + " must be a color literal or a variable reference to a color");
                 } else if (child.expression instanceof VariableReference) {
                     checkVariableReference(child.expression);
                 }

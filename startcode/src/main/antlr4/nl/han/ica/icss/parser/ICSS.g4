@@ -67,6 +67,7 @@ property_value      : (variable_identifier
 declaration         : property_name COLON property_value SEMICOLON;
 
 variable_value      : variable_identifier
+                    | expression
                     | color_literal
                     | pixel_literal
                     | percentage_literal

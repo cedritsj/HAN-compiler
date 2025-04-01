@@ -109,22 +109,32 @@ public class Checker {
         switch (child.property.name) {
             case "width":
             case "height":
-                if (type != ExpressionType.PIXEL && type != ExpressionType.PERCENTAGE) {
-                    child.setError(child.property.name + " must be a pixel or percentage literal or a variable reference to a pixel or percentage");
-                } else if (child.expression instanceof VariableReference) {
-                    checkVariableReference(child.expression);
-                } else if (child.expression instanceof Operation) {
-                    checkOperation((Operation) child.expression);
-                }
+                validateDimensionProperty(child, type);
                 break;
             case "background-color":
             case "color":
-                if (type != ExpressionType.COLOR) {
-                    child.setError(child.property.name + " must be a color literal or a variable reference to a color");
-                } else if (child.expression instanceof VariableReference) {
-                    checkVariableReference(child.expression);
-                }
+                validateColorProperty(child, type);
                 break;
+        }
+    }
+
+    private void validateDimensionProperty(Declaration child, ExpressionType type) {
+        validateProperty(child, type, ExpressionType.PIXEL, child.property.name + " must be a pixel or percentage literal or a variable reference to a pixel or percentage", VariableReference.class);
+    }
+
+    private void validateColorProperty(Declaration child, ExpressionType type) {
+        validateProperty(child, type, ExpressionType.COLOR, child.property.name + " must be a color literal or a variable reference to a color", VariableReference.class);
+    }
+
+    private <T extends Expression> void validateProperty(Declaration child, ExpressionType type, ExpressionType validType, String errorMessage, Class<T> clazz) {
+        if (type != validType) {
+            child.setError(errorMessage);
+        } else if (clazz.isInstance(child.expression)) {
+            if (child.expression instanceof VariableReference) {
+                checkVariableReference(child.expression);
+            } else if (child.expression instanceof Operation) {
+                checkOperation((Operation) child.expression);
+            }
         }
     }
 

@@ -33,11 +33,11 @@ public class Checker {
             if (child instanceof Stylerule) {
                 variableTypes.addFirst(new HashMap<>());
                 checkStylerule(child);
-                variableTypes.pop();
+                variableTypes.removeFirst();
             }
         }
 
-        variableTypes.pop();
+        variableTypes.removeFirst();
     }
 
     private void checkStylerule(ASTNode astNode) {
@@ -78,13 +78,13 @@ public class Checker {
             checkElseClause(child.elseClause);
         }
 
-        variableTypes.pop();
+        variableTypes.removeFirst();
     }
 
     private void checkElseClause(ElseClause child) {
         checkConditionalBody(child.getChildren());
 
-        variableTypes.pop();
+        variableTypes.removeFirst();
     }
 
     private void checkConditionalBody(ArrayList<ASTNode> children) {

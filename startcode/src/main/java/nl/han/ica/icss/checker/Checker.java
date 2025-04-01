@@ -158,13 +158,17 @@ public class Checker {
         if (leftType == ExpressionType.COLOR || rightType == ExpressionType.COLOR) {
             operation.setError("Color literals cannot be used in operations");
             return ExpressionType.UNDEFINED;
-        } else if (operation instanceof AddOperation || operation instanceof SubtractOperation) {
+        }
+
+        if (operation instanceof AddOperation || operation instanceof SubtractOperation) {
             if (leftType != rightType) {
                 operation.setError("Invalid operation types: " + leftType + " and " + rightType);
                 return ExpressionType.UNDEFINED;
             }
             return leftType;
-        } else if (operation instanceof MultiplyOperation) {
+        }
+
+        if (operation instanceof MultiplyOperation) {
             if (leftType != ExpressionType.SCALAR && rightType != ExpressionType.SCALAR) {
                 operation.setError("Invalid operation types: " + leftType + " and " + rightType);
                 return ExpressionType.UNDEFINED;

@@ -42,6 +42,7 @@ public class Checker {
 
     private void checkStylerule(ASTNode astNode) {
         for (ASTNode child : astNode.getChildren()) {
+
             if (child instanceof Declaration) {
                 checkDeclaration((Declaration) child);
                 continue;
@@ -49,6 +50,7 @@ public class Checker {
 
             if (child instanceof IfClause) {
                 checkIfClause((IfClause) child);
+                continue;
             }
 
             if (child instanceof VariableAssignment) {
@@ -153,7 +155,10 @@ public class Checker {
         ExpressionType leftType = checkExpression(operation.lhs);
         ExpressionType rightType = checkExpression(operation.rhs);
 
-        if (operation instanceof AddOperation || operation instanceof SubtractOperation) {
+        if (leftType == ExpressionType.COLOR || rightType == ExpressionType.COLOR) {
+            operation.setError("Color literals cannot be used in operations");
+            return ExpressionType.UNDEFINED;
+        } else if (operation instanceof AddOperation || operation instanceof SubtractOperation) {
             if (leftType != rightType) {
                 operation.setError("Invalid operation types: " + leftType + " and " + rightType);
                 return ExpressionType.UNDEFINED;

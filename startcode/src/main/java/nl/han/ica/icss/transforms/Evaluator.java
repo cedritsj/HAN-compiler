@@ -75,12 +75,12 @@ public class Evaluator implements Transform {
 
         if (transformedCondition instanceof BoolLiteral) {
             BoolLiteral boolLiteral = (BoolLiteral) transformedCondition;
-            applyIfClauseBody(ifClause, boolLiteral);
+            applyIfClauseBodyBasedOnCondition(ifClause, boolLiteral);
             applyIfClauseBody(ifClause, parentBody);
         }
     }
 
-    private void applyIfClauseBody(IfClause ifClause, BoolLiteral boolLiteral) {
+    private void applyIfClauseBodyBasedOnCondition(IfClause ifClause, BoolLiteral boolLiteral) {
         if (boolLiteral.value) {
             if (ifClause.elseClause != null) {
                 ifClause.elseClause.body = new ArrayList<>();

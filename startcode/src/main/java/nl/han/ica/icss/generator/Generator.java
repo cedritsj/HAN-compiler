@@ -6,7 +6,6 @@ import nl.han.ica.icss.ast.literals.ColorLiteral;
 import nl.han.ica.icss.ast.literals.PercentageLiteral;
 import nl.han.ica.icss.ast.literals.PixelLiteral;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class Generator {
@@ -46,7 +45,7 @@ public class Generator {
         for (ASTNode child : node.getChildren()) {
             if (child instanceof Declaration) {
                 Declaration declaration = (Declaration) child;
-                this.css.append("\t")
+                this.css.append("  ")
 						.append(declaration.property.name)
                         .append(": ")
                         .append(generateExpression(declaration.expression))

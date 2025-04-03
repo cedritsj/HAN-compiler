@@ -77,14 +77,10 @@ public class Checker {
         if (child.elseClause != null) {
             checkElseClause(child.elseClause);
         }
-
-        variableTypes.removeFirst();
     }
 
     private void checkElseClause(ElseClause child) {
         checkConditionalBody(child.getChildren());
-
-        variableTypes.removeFirst();
     }
 
     private void checkConditionalBody(ArrayList<ASTNode> children) {
@@ -95,12 +91,14 @@ public class Checker {
                 checkStylerule(astNode);
             } else if (astNode instanceof IfClause) {
                 checkIfClause((IfClause) astNode);
-            } else if (astNode instanceof VariableReference) {
-                checkVariableReference(astNode);
+            } else if (astNode instanceof VariableAssignment) {
+                checkVariableAssignment((VariableAssignment) astNode);
             } else if (astNode instanceof Declaration) {
                 checkDeclaration((Declaration) astNode);
             }
         }
+
+        variableTypes.removeFirst();
     }
 
     private void checkDeclaration(Declaration child) {
@@ -129,7 +127,10 @@ public class Checker {
     private <T extends Expression> void validateProperty(Declaration child, ExpressionType type, ExpressionType validType, String errorMessage, Class<T> clazz) {
         if (type != validType) {
             child.setError(errorMessage);
-        } else if (clazz.isInstance(child.expression)) {
+            return;
+        }
+
+        if (clazz.isInstance(child.expression)) {
             if (child.expression instanceof VariableReference) {
                 checkVariableReference(child.expression);
             } else if (child.expression instanceof Operation) {
@@ -188,31 +189,29 @@ public class Checker {
         return leftType;
     }
 
-    public ExpressionType checkExpression(ASTNode child) {
-        Expression expression = (Expression) child;
-
-        if (expression instanceof Operation) {
-            return checkOperation((Operation) expression);
+    private ExpressionType checkExpression(ASTNode child) {
+        if (child instanceof Operation) {
+            return checkOperation((Operation) child);
         }
-
-        return determineExpressionType(expression);
+        return determineExpressionType((Expression) child);
     }
 
     private ExpressionType determineExpressionType(Expression expression) {
-        if (expression instanceof VariableReference) {
-            return checkVariableReference(expression);
-        } else if (expression instanceof ColorLiteral) {
-            return ExpressionType.COLOR;
-        } else if (expression instanceof PixelLiteral) {
-            return ExpressionType.PIXEL;
-        } else if (expression instanceof PercentageLiteral) {
-            return ExpressionType.PERCENTAGE;
-        } else if (expression instanceof ScalarLiteral) {
-            return ExpressionType.SCALAR;
-        } else if (expression instanceof BoolLiteral) {
-            return ExpressionType.BOOL;
-        } else {
-            return ExpressionType.UNDEFINED;
+        switch (expression.getClass().getSimpleName()) {
+            case "VariableReference":
+                return checkVariableReference(expression);
+            case "ColorLiteral":
+                return ExpressionType.COLOR;
+            case "PixelLiteral":
+                return ExpressionType.PIXEL;
+            case "PercentageLiteral":
+                return ExpressionType.PERCENTAGE;
+            case "ScalarLiteral":
+                return ExpressionType.SCALAR;
+            case "BoolLiteral":
+                return ExpressionType.BOOL;
+            default:
+                return ExpressionType.UNDEFINED;
         }
     }
 }

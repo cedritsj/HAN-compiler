@@ -1,7 +1,6 @@
 package nl.han.ica.icss.checker;
 
 import nl.han.ica.icss.ast.*;
-import nl.han.ica.icss.ast.literals.*;
 import nl.han.ica.icss.ast.operations.AddOperation;
 import nl.han.ica.icss.ast.operations.MultiplyOperation;
 import nl.han.ica.icss.ast.operations.SubtractOperation;

@@ -116,23 +116,21 @@ public class Checker {
     }
 
     private void validateDimensionProperty(Declaration child, ExpressionType type) {
-        validateProperty(child, type, ExpressionType.PIXEL, child.property.name + " must be a pixel or percentage literal or a variable reference to a pixel or percentage", VariableReference.class);
+        validateProperty(child, type, ExpressionType.PIXEL, child.property.name + " must be a pixel or percentage literal or a variable reference to a pixel or percentage");
     }
 
     private void validateColorProperty(Declaration child, ExpressionType type) {
-        validateProperty(child, type, ExpressionType.COLOR, child.property.name + " must be a color literal or a variable reference to a color", VariableReference.class);
+        validateProperty(child, type, ExpressionType.COLOR, child.property.name + " must be a color literal or a variable reference to a color");
     }
 
-    private <T extends Expression> void validateProperty(Declaration child, ExpressionType validType, ExpressionType type, String errorMessage, Class<T> clazz) {
-        if (clazz.isInstance(child.expression)) {
-            if (child.expression instanceof VariableReference) {
-                ExpressionType variableType = checkVariableReference(child.expression);
-                if (variableType == ExpressionType.UNDEFINED) {
-                    return;
-                }
-            } else if (child.expression instanceof Operation) {
-                checkOperation((Operation) child.expression);
+    private void validateProperty(Declaration child, ExpressionType validType, ExpressionType type, String errorMessage) {
+        if (child.expression instanceof VariableReference) {
+            ExpressionType variableType = checkVariableReference(child.expression);
+            if (variableType == ExpressionType.UNDEFINED) {
+                return;
             }
+        } else if (child.expression instanceof Operation) {
+            checkOperation((Operation) child.expression);
         }
 
         if (type != validType) {

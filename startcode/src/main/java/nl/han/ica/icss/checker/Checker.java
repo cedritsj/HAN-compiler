@@ -124,18 +124,20 @@ public class Checker {
         validateProperty(child, type, ExpressionType.COLOR, child.property.name + " must be a color literal or a variable reference to a color", VariableReference.class);
     }
 
-    private <T extends Expression> void validateProperty(Declaration child, ExpressionType type, ExpressionType validType, String errorMessage, Class<T> clazz) {
-        if (type != validType) {
-            child.setError(errorMessage);
-            return;
-        }
-
+    private <T extends Expression> void validateProperty(Declaration child, ExpressionType validType, ExpressionType type, String errorMessage, Class<T> clazz) {
         if (clazz.isInstance(child.expression)) {
             if (child.expression instanceof VariableReference) {
-                checkVariableReference(child.expression);
+                ExpressionType variableType = checkVariableReference(child.expression);
+                if (variableType == ExpressionType.UNDEFINED) {
+                    return;
+                }
             } else if (child.expression instanceof Operation) {
                 checkOperation((Operation) child.expression);
             }
+        }
+
+        if (type != validType) {
+            child.setError(errorMessage);
         }
     }
 

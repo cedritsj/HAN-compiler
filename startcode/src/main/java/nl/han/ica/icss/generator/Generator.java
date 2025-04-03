@@ -1,6 +1,5 @@
 package nl.han.ica.icss.generator;
 
-
 import nl.han.ica.icss.ast.*;
 import nl.han.ica.icss.ast.literals.ColorLiteral;
 import nl.han.ica.icss.ast.literals.PercentageLiteral;

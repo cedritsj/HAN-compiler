@@ -27,7 +27,7 @@ public class Generator {
 
                 generateDeclaration(child);
 
-				this.css.append("}\n");
+                this.css.append("}\n");
             }
         }
     }
@@ -45,7 +45,7 @@ public class Generator {
             if (child instanceof Declaration) {
                 Declaration declaration = (Declaration) child;
                 this.css.append("  ")
-						.append(declaration.property.name)
+                        .append(declaration.property.name)
                         .append(": ")
                         .append(generateExpression(declaration.expression))
                         .append(";\n");
@@ -53,17 +53,17 @@ public class Generator {
         }
     }
 
-	private String generateExpression(Expression expression) {
-		if (expression instanceof PixelLiteral) {
-			PixelLiteral pixelLiteral = (PixelLiteral) expression;
-			return pixelLiteral.value + "px";
-		} else if (expression instanceof ColorLiteral) {
-			ColorLiteral colorLiteral = (ColorLiteral) expression;
-			return colorLiteral.value;
-		} else if (expression instanceof PercentageLiteral) {
-			PercentageLiteral percentageLiteral = (PercentageLiteral) expression;
-			return percentageLiteral.value + "%";
-		}
-			return "";
-	}
+    private String generateExpression(Expression expression) {
+        if (expression instanceof PixelLiteral) {
+            PixelLiteral pixelLiteral = (PixelLiteral) expression;
+            return pixelLiteral.value + "px";
+        } else if (expression instanceof ColorLiteral) {
+            ColorLiteral colorLiteral = (ColorLiteral) expression;
+            return colorLiteral.value;
+        } else if (expression instanceof PercentageLiteral) {
+            PercentageLiteral percentageLiteral = (PercentageLiteral) expression;
+            return percentageLiteral.value + "%";
+        }
+        return "";
+    }
 }

@@ -82,13 +82,16 @@ public class Evaluator implements Transform {
 
     private void applyIfClauseBodyBasedOnCondition(IfClause ifClause, BoolLiteral boolLiteral) {
         if (boolLiteral.value) {
+            // Clear else clause body if condition is true
             if (ifClause.elseClause != null) {
                 ifClause.elseClause.body = new ArrayList<>();
             }
         } else {
             if (ifClause.elseClause == null) {
+                // Clear if clause body if no else clause exists
                 ifClause.body = new ArrayList<>();
             } else {
+                // Move else clause body to if clause body
                 ifClause.body = ifClause.elseClause.body;
                 ifClause.elseClause.body = new ArrayList<>();
             }

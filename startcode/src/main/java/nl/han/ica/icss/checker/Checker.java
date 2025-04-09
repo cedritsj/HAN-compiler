@@ -2,9 +2,13 @@ package nl.han.ica.icss.checker;
 
 import nl.han.ica.icss.ast.*;
 import nl.han.ica.icss.ast.types.ExpressionType;
+import nl.han.ica.icss.checker.validators.ColorValidator;
+import nl.han.ica.icss.checker.validators.DimensionValidator;
+import nl.han.ica.icss.checker.validators.IPropertyValidator;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 public class Checker {
 
@@ -12,6 +16,16 @@ public class Checker {
     private final ExpressionChecker expressionChecker = new ExpressionChecker(this);
     private final ConditionalChecker conditionalChecker = new ConditionalChecker(this);
     private LinkedList<HashMap<String, ExpressionType>> variableTypes;
+    private final Map<String, IPropertyValidator> propertyValidators = new HashMap<>();
+
+
+    public Checker() {
+        // Initialize property validators
+        propertyValidators.put("width", new DimensionValidator());
+        propertyValidators.put("height", new DimensionValidator());
+        propertyValidators.put("background-color", new ColorValidator());
+        propertyValidators.put("color", new ColorValidator());
+    }
 
     public void check(AST ast) {
         variableTypes = new LinkedList<>();
@@ -57,26 +71,14 @@ public class Checker {
     void checkDeclaration(Declaration child) {
         ExpressionType type = this.expressionChecker.checkExpression(child.expression);
 
-        switch (child.property.name) {
-            case "width":
-            case "height":
-                validateDimensionProperty(child, type);
-                break;
-            case "background-color":
-            case "color":
-                validateColorProperty(child, type);
-                break;
+        // Use the property validator if available
+        IPropertyValidator validator = propertyValidators.get(child.property.name);
+        if (validator != null) {
+            validator.validate(child, type, this);
         }
     }
 
-    private void validateDimensionProperty(Declaration child, ExpressionType type) {
-        validateProperty(child, new ExpressionType[]{ExpressionType.PIXEL, ExpressionType.PERCENTAGE}, type, child.property.name + " must be a pixel or percentage literal or a variable reference to a pixel or percentage"); }
-
-    private void validateColorProperty(Declaration child, ExpressionType type) {
-        validateProperty(child, new ExpressionType[]{ExpressionType.COLOR}, type, child.property.name + " must be a color literal or a variable reference to a color");
-    }
-
-    private void validateProperty(Declaration child, ExpressionType[] validTypes, ExpressionType type, String errorMessage) {
+    public void validateProperty(Declaration child, ExpressionType[] validTypes, ExpressionType type, String errorMessage) {
         if (child.expression instanceof VariableReference) {
             ExpressionType variableType = this.variableChecker.checkVariableReference(child.expression);
             if (variableType == ExpressionType.UNDEFINED) {

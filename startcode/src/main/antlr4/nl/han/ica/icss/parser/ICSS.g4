@@ -41,7 +41,7 @@ MUL: '*';
 ASSIGNMENT_OPERATOR: ':=';
 
 //--- PARSER: ---
-id_selector         : ID_IDENT;
+id_selector         : ID_IDENT | COLOR;
 class_selector      : CLASS_IDENT;
 property_name       : LOWER_IDENT;
 

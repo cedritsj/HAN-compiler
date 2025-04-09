@@ -70,14 +70,13 @@ public class Checker {
     }
 
     private void validateDimensionProperty(Declaration child, ExpressionType type) {
-        validateProperty(child, ExpressionType.PIXEL, type, child.property.name + " must be a pixel or percentage literal or a variable reference to a pixel or percentage");
-    }
+        validateProperty(child, new ExpressionType[]{ExpressionType.PIXEL, ExpressionType.PERCENTAGE}, type, child.property.name + " must be a pixel or percentage literal or a variable reference to a pixel or percentage"); }
 
     private void validateColorProperty(Declaration child, ExpressionType type) {
-        validateProperty(child, ExpressionType.COLOR, type, child.property.name + " must be a color literal or a variable reference to a color");
+        validateProperty(child, new ExpressionType[]{ExpressionType.COLOR}, type, child.property.name + " must be a color literal or a variable reference to a color");
     }
 
-    private void validateProperty(Declaration child, ExpressionType validType, ExpressionType type, String errorMessage) {
+    private void validateProperty(Declaration child, ExpressionType[] validTypes, ExpressionType type, String errorMessage) {
         if (child.expression instanceof VariableReference) {
             ExpressionType variableType = this.variableChecker.checkVariableReference(child.expression);
             if (variableType == ExpressionType.UNDEFINED) {
@@ -87,7 +86,15 @@ public class Checker {
             expressionChecker.checkOperation((Operation) child.expression);
         }
 
-        if (type != validType) {
+        boolean isValid = false;
+        for (ExpressionType validType : validTypes) {
+            if (type == validType) {
+                isValid = true;
+                break;
+            }
+        }
+
+        if (!isValid) {
             child.setError(errorMessage);
         }
     }

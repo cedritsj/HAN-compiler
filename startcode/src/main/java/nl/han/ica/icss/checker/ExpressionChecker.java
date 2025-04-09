@@ -28,6 +28,11 @@ public class ExpressionChecker {
             return ExpressionType.UNDEFINED;
         }
 
+        if (leftType == ExpressionType.BOOL || rightType == ExpressionType.BOOL) {
+            operation.setError("Boolean literals cannot be used in operations");
+            return ExpressionType.UNDEFINED;
+        }
+
         if (operation instanceof AddOperation || operation instanceof SubtractOperation) {
             if (leftType != rightType) {
                 operation.setError("Invalid operation types: " + leftType + " and " + rightType);

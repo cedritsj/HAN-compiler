@@ -8,10 +8,6 @@ import java.util.LinkedList;
 public class CheckerContext {
     private final LinkedList<HashMap<String, ExpressionType>> variableTypes = new LinkedList<>();
 
-    public LinkedList<HashMap<String, ExpressionType>> getVariableTypes() {
-        return variableTypes;
-    }
-
     public void addVariableScope() {
         variableTypes.addFirst(new HashMap<>());
     }

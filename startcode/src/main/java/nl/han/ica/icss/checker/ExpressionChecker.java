@@ -5,11 +5,10 @@ import nl.han.ica.icss.ast.operations.*;
 import nl.han.ica.icss.ast.types.ExpressionType;
 
 public class ExpressionChecker {
+    private final CheckerContext context;
 
-    private final Checker checker;
-
-    public ExpressionChecker(Checker checker) {
-        this.checker = checker;
+    public ExpressionChecker(CheckerContext context) {
+        this.context = context;
     }
 
     public ExpressionType checkExpression(ASTNode child) {
@@ -54,7 +53,8 @@ public class ExpressionChecker {
     private ExpressionType determineExpressionType(Expression expression) {
         switch (expression.getClass().getSimpleName()) {
             case "VariableReference":
-                return checker.getVariableChecker().checkVariableReference(expression);
+                VariableChecker variableChecker = new VariableChecker(context);
+                return variableChecker.checkVariableReference(expression);
             case "ColorLiteral":
                 return ExpressionType.COLOR;
             case "PixelLiteral":

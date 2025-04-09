@@ -2,6 +2,7 @@ package nl.han.ica.icss;
 
 import nl.han.ica.icss.ast.AST;
 import nl.han.ica.icss.checker.Checker;
+import nl.han.ica.icss.checker.CheckerContext;
 import nl.han.ica.icss.checker.SemanticError;
 import nl.han.ica.icss.generator.Generator;
 import nl.han.ica.icss.parser.ASTListener;
@@ -84,21 +85,22 @@ public class Pipeline implements ANTLRErrorListener {
         checked = transformed = false;
     }
     public boolean check() {
-            if(ast == null)
-                return false;
+        if (ast == null)
+            return false;
 
-           (new Checker()).check(this.ast);
+        CheckerContext context = new CheckerContext();
+        (new Checker(context)).check(this.ast);
 
-            ArrayList<SemanticError> errors = this.ast.getErrors();
-            if (!errors.isEmpty()) {
-                for (SemanticError e : errors) {
-                    this.errors.add(e.toString());
-                }
+        ArrayList<SemanticError> errors = this.ast.getErrors();
+        if (!errors.isEmpty()) {
+            for (SemanticError e : errors) {
+                this.errors.add(e.toString());
             }
+        }
 
-            checked = errors.isEmpty();
-            transformed = false;
-            return errors.isEmpty();
+        checked = errors.isEmpty();
+        transformed = false;
+        return errors.isEmpty();
     }
 
     public void clearErrors(){

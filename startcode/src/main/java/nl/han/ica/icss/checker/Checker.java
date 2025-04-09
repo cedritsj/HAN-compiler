@@ -3,11 +3,21 @@ package nl.han.ica.icss.checker;
 import nl.han.ica.icss.ast.*;
 import nl.han.ica.icss.ast.types.ExpressionType;
 
+import java.util.Arrays;
+import java.util.Map;
+
 public class Checker {
     private final CheckerContext context;
     private final VariableChecker variableChecker;
     private final ExpressionChecker expressionChecker;
     private final ConditionalChecker conditionalChecker;
+
+    private static final Map<String, ExpressionType[]> PROPERTY_RULES = Map.of(
+            "background-color", new ExpressionType[]{ExpressionType.COLOR},
+            "color", new ExpressionType[]{ExpressionType.COLOR},
+            "width", new ExpressionType[]{ExpressionType.PIXEL, ExpressionType.PERCENTAGE},
+            "height", new ExpressionType[]{ExpressionType.PIXEL, ExpressionType.PERCENTAGE}
+    );
 
     public Checker(CheckerContext context) {
         this.context = context != null ? context : new CheckerContext();
@@ -47,19 +57,22 @@ public class Checker {
     }
 
     public void checkDeclaration(Declaration declaration) {
-        expressionChecker.checkExpression(declaration.expression);
+        ExpressionType actualType = expressionChecker.checkExpression(declaration.expression);
+
+        ExpressionType[] expectedTypes = PROPERTY_RULES.get(declaration.property.name);
+        if (expectedTypes != null && !isValidType(actualType, expectedTypes)) {
+            declaration.setError("Invalid type for property '" + declaration.property.name + "'. Expected: " +
+                    String.join(", ", Arrays.stream(expectedTypes).map(Enum::name).toArray(String[]::new)) +
+                    ", but found: " + actualType);
+        }
     }
 
-    public void validateProperty(Declaration declaration, ExpressionType[] expectedTypes, ExpressionType actualType, String errorMessage) {
-        boolean isValid = false;
+    private boolean isValidType(ExpressionType actualType, ExpressionType[] expectedTypes) {
         for (ExpressionType expectedType : expectedTypes) {
             if (expectedType == actualType) {
-                isValid = true;
-                break;
+                return true;
             }
         }
-        if (!isValid) {
-            declaration.setError(errorMessage);
-        }
+        return false;
     }
 }
